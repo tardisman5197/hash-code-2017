@@ -42,8 +42,17 @@ func TestCoverage(t *testing.T) {
 	file.grid[2][7].router = true
 	file.grid = addCoverage(file.grid, file.routerRange, 2, 7)
 	result = covered(file.grid)
-	expected = 21
+	expected = 16
 	if result != expected {
 		t.Errorf("Coverage Error: %v != %v\nrouter: %v, %v", result, expected, 2, 7)
+	}
+
+	file = readFile("final_round_2017.in/test.in")
+	file.grid[2][15].router = true
+	file.grid = addCoverage(file.grid, file.routerRange, 2, 15)
+	result = covered(file.grid)
+	expected = 20
+	if result != expected {
+		t.Errorf("Coverage Error: %v != %v\nrouter: %v, %v", result, expected, 2, 15)
 	}
 }

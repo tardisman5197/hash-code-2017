@@ -15,6 +15,7 @@ type cell struct {
 	covered  bool
 	backbone bool
 	router   bool
+	checked  bool
 }
 
 type file struct {
@@ -34,9 +35,12 @@ const (
 func main() {
 	// Read File
 	newFile := readFile("final_round_2017.in/test.in")
-	newFile.grid[2][7].router = true
-	newFile.grid = addCoverage(newFile.grid, newFile.routerRange, 2, 7)
+	newFile.grid[2][15].router = true
+	newFile.grid = addCoverage(newFile.grid, newFile.routerRange, 2, 15)
+	newFile.grid[3][10].router = true
+	newFile.grid = addCoverage(newFile.grid, newFile.routerRange, 3, 10)
 	printGrid(newFile.grid)
+	fmt.Println(covered(newFile.grid))
 
 	// Place routers
 	//		Detect collide with wall
@@ -97,6 +101,7 @@ func addCoverage(grid [][]cell, radius, x, y int) [][]cell {
 			if x-radius+i >= 0 && x-radius+i < len(grid) &&
 				y-radius+j >= 0 && y-radius+j < len(grid[0]) {
 				if grid[x-radius+i][y-radius+j].value != wall && grid[x-radius+i][y-radius+j].value != void {
+					grid[x-radius+i][y-radius+j].checked = true
 					if !isBlocked(grid, x, y, x-radius+i, y-radius+j) {
 						grid[x-radius+i][y-radius+j].covered = true
 					}
@@ -108,59 +113,32 @@ func addCoverage(grid [][]cell, radius, x, y int) [][]cell {
 }
 
 func isBlocked(grid [][]cell, x1, y1, x2, y2 int) bool {
-	distX := x1 - x2
-	distY := y1 - y2
-	right := false
-	down := false
-	if distX < 0 {
-		right = true
-		distX = -distX
-	}
-	if distY < 0 {
-		down = true
-		distY = -distY
-	}
-	// fmt.Printf("distX: %v\tdistY: %v\tright: %v\tdown: %v\n", distX, distY, right, down)
-	// fmt.Printf("coords 1: %v %v\t coords 2: %v %v\n", x1, y1, x2, y2)
-	for i := 0; i < distX; i++ {
-		var cellValue rune
-		if right {
-			cellValue = grid[x1-i][y1].value
-		} else {
-			cellValue = grid[x1+i][y1].value
-		}
-		if cellValue == wall {
-			return true
-		}
-		if right {
-			cellValue = grid[x1-i][y2].value
-		} else {
-			cellValue = grid[x1+i][y2].value
-		}
-		if cellValue == wall {
-			return true
-		}
-	}
-	for i := 0; i < distY; i++ {
-		var cellValue rune
-		if down {
-			cellValue = grid[x1][y1-i].value
-		} else {
-			cellValue = grid[x1][y1+i].value
-		}
-		if cellValue == wall {
-			return true
-		}
-		if down {
-			cellValue = grid[x2][y1-i].value
-		} else {
-			cellValue = grid[x2][y1+i].value
-		}
-		if cellValue == wall {
-			return true
-		}
-	}
 
+	// fmt.Printf("coords 1: %v %v\t coords 2: %v %v\n", x1, y1, x2, y2)
+
+	if x1 > x2 {
+		tmp := x1
+		x1 = x2
+		x2 = tmp
+	}
+	for i := x1; i < x2; i++ {
+		if grid[i][y1].value == wall || grid[i][y2].value == wall {
+			// fmt.Printf("\ti: %v y1: %v y2: %v %v\n", i, y1, y2, true)
+			return true
+		}
+	}
+	if y1 > y2 {
+		tmp := y1
+		y1 = y2
+		y2 = tmp
+	}
+	for i := y1; i < y2; i++ {
+		if grid[x1][i].value == wall || grid[x2][i].value == wall {
+			// fmt.Printf("\ti: %v x1: %v x2: %v %v\n", i, x1, x2, true)
+			return true
+		}
+	}
+	// fmt.Printf("\t%v\n", false)
 	return false
 }
 
@@ -174,6 +152,8 @@ func printGrid(grid [][]cell) {
 				color.New(color.BgCyan).Print(string(cell.value))
 			} else if cell.covered {
 				color.New(color.BgGreen).Print(string(cell.value))
+			} else if cell.checked {
+				color.New(color.BgRed).Print(string(cell.value))
 			} else {
 				fmt.Print(string(cell.value))
 			}
