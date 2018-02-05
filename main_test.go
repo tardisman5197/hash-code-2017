@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"testing"
 )
 
@@ -55,4 +56,15 @@ func TestCoverage(t *testing.T) {
 	if result != expected {
 		t.Errorf("Coverage Error: %v != %v\nrouter: %v, %v", result, expected, 2, 15)
 	}
+}
+
+func TestScore(t *testing.T) {
+	file := readFile("final_round_2017.in/test.in")
+	file.grid[3][6].router = true
+	file.grid = addCoverage(file.grid, file.routerRange, 3, 6)
+	file.grid = connectToBackbone(file.grid, 3, 6)
+	file.grid[3][9].router = true
+	file.grid = addCoverage(file.grid, file.routerRange, 3, 9)
+	file.grid = connectToBackbone(file.grid, 3, 9)
+	fmt.Println(calculateScore(file))
 }

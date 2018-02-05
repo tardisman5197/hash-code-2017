@@ -3,6 +3,7 @@ package main
 import (
 	"bufio"
 	"fmt"
+	"math"
 	"os"
 	"strconv"
 	"strings"
@@ -19,6 +20,7 @@ type cell struct {
 }
 
 type file struct {
+	cost        int
 	routerRange int
 	backbone    int
 	router      int
@@ -34,13 +36,28 @@ const (
 
 func main() {
 	// Read File
-	newFile := readFile("final_round_2017.in/test.in")
-	newFile.grid[2][15].router = true
-	newFile.grid = addCoverage(newFile.grid, newFile.routerRange, 2, 15)
-	newFile.grid[3][10].router = true
-	newFile.grid = addCoverage(newFile.grid, newFile.routerRange, 3, 10)
+
+	// file := readFile("final_round_2017.in/test.in")
+	// file.grid[3][6].router = true
+	// file.grid = addCoverage(file.grid, file.routerRange, 3, 6)
+	// file.grid = connectToBackbone(file.grid, 3, 6)
+	// file.grid[3][9].router = true
+	// file.grid = addCoverage(file.grid, file.routerRange, 3, 9)
+	// file.grid = connectToBackbone(file.grid, 3, 9)
+	// printGrid(file.grid)
+	// fmt.Println(calculateScore(file))
+	//
+	// newFile := readFile("final_round_2017.in/test.in")
+	// newFile = run(newFile)
+	// printGrid(newFile.grid)
+	// fmt.Println(covered(newFile.grid))
+	// fmt.Printf("cost: %v budget: %v\n", newFile.cost, newFile.budget)
+
+	newFile := readFile(os.Args[1])
+	newFile = run(newFile)
 	printGrid(newFile.grid)
 	fmt.Println(covered(newFile.grid))
+	fmt.Printf("cost: %v budget: %v\n", newFile.cost, newFile.budget)
 
 	// Place routers
 	//		Detect collide with wall
@@ -48,6 +65,110 @@ func main() {
 	// Connect routers to backbone
 	// Calculate cost
 	// Output file
+}
+
+func run(newFile file) file {
+	for {
+		currentFile := newFile
+		currentFile.grid = findNextRouter(currentFile.grid, currentFile.routerRange)
+		currentFile.cost = calculateCost(currentFile.grid, currentFile.backbone, currentFile.router)
+		if currentFile.cost > currentFile.budget {
+			break
+		}
+		newFile = currentFile
+		if fullyCovered(newFile.grid) {
+			break
+		}
+	}
+	return newFile
+}
+
+func calculateScore(model file) int {
+	var score = 0
+	score += 1000 * covered(model.grid)
+	score += (model.budget - calculateCost(model.grid, model.backbone, model.router))
+	score--
+	return score
+}
+
+func calculateCost(grid [][]cell, backbone, router int) int {
+	var cost = 0
+	for i := 0; i < len(grid); i++ {
+		for j := 0; j < len(grid[0]); j++ {
+			if grid[i][j].router {
+				cost += router
+			}
+			if grid[i][j].backbone {
+				cost += backbone
+			}
+		}
+	}
+	return cost
+}
+
+func connectToBackbone(grid [][]cell, x, y int) [][]cell {
+	var x2, y2, bestDistance = 0, 0, math.MaxFloat64
+	for i := 0; i < len(grid); i++ {
+		for j := 0; j < len(grid[0]); j++ {
+			if grid[i][j].backbone {
+				currentDistance := math.Sqrt(float64((x-i)*(x-i) + (y-j)*(y-j)))
+				if currentDistance < bestDistance {
+					x2 = i
+					y2 = j
+					bestDistance = currentDistance
+				}
+			}
+		}
+	}
+
+	startX := x
+	endX := x2
+	if x > x2 {
+		startX = x2
+		endX = x
+	}
+	for i := startX; i <= endX; i++ {
+		grid[i][y].backbone = true
+	}
+
+	startY := y
+	endY := y2
+	if y > y2 {
+		startY = y2
+		endY = y
+	}
+	for i := startY; i <= endY; i++ {
+		grid[x2][i].backbone = true
+	}
+	return grid
+}
+
+func fullyCovered(grid [][]cell) bool {
+	for i := 0; i < len(grid); i++ {
+		for j := 0; j < len(grid[0]); j++ {
+			if grid[i][j].value == target && !grid[i][j].checked {
+				return false
+			}
+		}
+	}
+	return true
+}
+
+func findNextRouter(grid [][]cell, radius int) [][]cell {
+	var x, y, rating = 0, 0, 0
+	for i := 0; i < len(grid); i++ {
+		for j := 0; j < len(grid[0]); j++ {
+			if getRating(grid, radius, i, j) > rating {
+				x = i
+				y = j
+				rating = getRating(grid, radius, x, y)
+			}
+		}
+	}
+	grid[x][y].router = true
+	addCoverage(grid, radius, x, y)
+	connectToBackbone(grid, x, y)
+	return grid
 }
 
 func readFile(filename string) file {
@@ -95,7 +216,7 @@ func readFile(filename string) file {
 }
 
 func addCoverage(grid [][]cell, radius, x, y int) [][]cell {
-	fmt.Printf("Len grid: %v len grid[0]: %v", len(grid), len(grid[0]))
+	// fmt.Printf("Len grid: %v len grid[0]: %v\n", len(grid), len(grid[0]))
 	for i := 0; i < (radius*2 + 1); i++ {
 		for j := 0; j < (radius*2 + 1); j++ {
 			if x-radius+i >= 0 && x-radius+i < len(grid) &&
@@ -173,4 +294,23 @@ func covered(grid [][]cell) int {
 		}
 	}
 	return total
+}
+
+func getRating(grid [][]cell, radius, x, y int) int {
+	rating := 0
+	for i := 0; i < (radius*2 + 1); i++ {
+		for j := 0; j < (radius*2 + 1); j++ {
+			if x-radius+i >= 0 && x-radius+i < len(grid) &&
+				y-radius+j >= 0 && y-radius+j < len(grid[0]) {
+				if grid[x-radius+i][y-radius+j].value != wall && grid[x-radius+i][y-radius+j].value != void {
+					if !isBlocked(grid, x, y, x-radius+i, y-radius+j) {
+						if !grid[x-radius+i][y-radius+j].covered {
+							rating++
+						}
+					}
+				}
+			}
+		}
+	}
+	return rating
 }
