@@ -58,8 +58,8 @@ func main() {
 	newFile := readFile(os.Args[1])
 	newFile = run(newFile)
 	printGrid(newFile.grid)
-	fmt.Println(covered(newFile.grid))
-	fmt.Printf("cost: %v budget: %v\n", newFile.cost, newFile.budget)
+	fmt.Printf("\nCovered: %v\n", covered(newFile.grid))
+	fmt.Printf("Cost: %v Budget: %v\n", newFile.cost, newFile.budget)
 
 	// Place routers
 	//		Detect collide with wall
@@ -67,12 +67,13 @@ func main() {
 	// Connect routers to backbone
 	// Calculate cost
 	// Output file
-	fmt.Printf("Execute time: %v", time.Since(start))
+	fmt.Printf("Execute time: %v\n", time.Since(start))
+	fmt.Printf("Score: %v\n", calculateScore(newFile))
 }
 
 func run(newFile file) file {
 	maxRating := (newFile.routerRange*2 + 1) * (newFile.routerRange*2 + 1)
-	fmt.Println(maxRating)
+	fmt.Printf("maxRating: %v\n", maxRating)
 	i := 0
 	for {
 		currentFile := newFile
