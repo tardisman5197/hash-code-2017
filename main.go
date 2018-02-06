@@ -7,6 +7,7 @@ import (
 	"os"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/fatih/color"
 )
@@ -35,6 +36,7 @@ const (
 )
 
 func main() {
+	start := time.Now()
 	// Read File
 
 	// file := readFile("final_round_2017.in/test.in")
@@ -65,12 +67,18 @@ func main() {
 	// Connect routers to backbone
 	// Calculate cost
 	// Output file
+	fmt.Printf("Execute time: %v", time.Since(start))
 }
 
 func run(newFile file) file {
+	maxRating := (newFile.routerRange*2 + 1) * (newFile.routerRange*2 + 1)
+	fmt.Println(maxRating)
+	i := 0
 	for {
 		currentFile := newFile
-		currentFile.grid = findNextRouter(currentFile.grid, currentFile.routerRange)
+		fmt.Printf("findNextRouters: %v\n", i)
+		i++
+		currentFile.grid, maxRating = findNextRouters(currentFile.grid, currentFile.routerRange, maxRating)
 		currentFile.cost = calculateCost(currentFile.grid, currentFile.backbone, currentFile.router)
 		if currentFile.cost > currentFile.budget {
 			break
@@ -154,21 +162,33 @@ func fullyCovered(grid [][]cell) bool {
 	return true
 }
 
-func findNextRouter(grid [][]cell, radius int) [][]cell {
+func findNextRouters(grid [][]cell, radius, maxRating int) ([][]cell, int) {
 	var x, y, rating = 0, 0, 0
 	for i := 0; i < len(grid); i++ {
 		for j := 0; j < len(grid[0]); j++ {
-			if getRating(grid, radius, i, j) > rating {
+			if getRating(grid, radius, i, j) >= maxRating && maxRating != 0 {
+				fmt.Printf("\tmaxRating: %v found\n", maxRating)
+				fmt.Printf("\t\t x,y: %v %v\n", i, j)
+				x = i
+				y = j
+				grid[x][y].router = true
+				addCoverage(grid, radius, x, y)
+				connectToBackbone(grid, x, y)
+				rating = getRating(grid, radius, x, y)
+			} else if getRating(grid, radius, i, j) > rating {
 				x = i
 				y = j
 				rating = getRating(grid, radius, x, y)
 			}
+
 		}
 	}
 	grid[x][y].router = true
 	addCoverage(grid, radius, x, y)
 	connectToBackbone(grid, x, y)
-	return grid
+	fmt.Printf("\trating: %v found\n", rating)
+	fmt.Printf("\t\t x,y: %v %v\n", x, y)
+	return grid, rating
 }
 
 func readFile(filename string) file {
