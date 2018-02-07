@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"testing"
 )
 
@@ -66,5 +65,9 @@ func TestScore(t *testing.T) {
 	file.grid[3][9].router = true
 	file.grid = addCoverage(file.grid, file.routerRange, 3, 9)
 	file.grid = connectToBackbone(file.grid, 3, 9)
-	fmt.Println(calculateScore(file))
+	result := calculateScore(file)
+	expected := 35017
+	if result != expected {
+		t.Errorf("Score Error: %v != %v\n", result, expected)
+	}
 }
