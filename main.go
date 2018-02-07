@@ -139,7 +139,7 @@ func findNextRouters(grid [][]cell, radius, maxRating int) ([][]cell, int) {
 //				 x coord of point to connect
 //				 y coord of point to connect
 // Returns: output grid
-func connectToBackbone(grid [][]cell, x, y int) [][]cell {
+func worseConnectToBackbone(grid [][]cell, x, y int) [][]cell {
 	// Init x2,y2 and set bestDistance to highest possible value
 	var x2, y2, bestDistance = 0, 0, math.MaxFloat64
 	// Loop though grid
@@ -185,6 +185,99 @@ func connectToBackbone(grid [][]cell, x, y int) [][]cell {
 		grid[x2][i].backbone = true
 	}
 
+	return grid
+}
+
+// Connects a point to the closest backbone cell
+// Params: grid
+//				 x coord of point to connect
+//				 y coord of point to connect
+// Returns: output grid
+func connectToBackbone(grid [][]cell, x, y int) [][]cell {
+	// Init x2,y2 and set bestDistance to highest possible value
+	var x1, y1, bestDistance = 0, 0, math.MaxFloat64
+	// Loop though grid
+	for i := 0; i < len(grid); i++ {
+		for j := 0; j < len(grid[0]); j++ {
+			// Check if cell contains backbone
+			if grid[i][j].backbone {
+				// Calculate distance from point
+				currentDistance := math.Sqrt(float64((x-i)*(x-i) + (y-j)*(y-j)))
+				// Check if distance is the shortest
+				if currentDistance < bestDistance {
+					x1 = i
+					y1 = j
+					bestDistance = currentDistance
+				}
+			}
+		}
+	}
+	//
+	// startX := x
+	// endX := x2
+	// if x > x2 {
+	// 	startX = x2
+	// 	endX = x
+	// }
+	// startY := y
+	// endY := y2
+	// if y > y2 {
+	// 	startY = y2
+	// 	endY = y
+	// }
+	//
+	// dx := endX - startX
+	// dy := endY - startY
+	// de := math.Abs(float64(dy) / float64(dx))
+	//
+	// error := 0.0
+	//
+	// j := startY
+	// for i := startX; i < endX; i++ {
+	// 	grid[i][j].backbone = true
+	// 	error = error + de
+	// 	if error >= 0.5 {
+	// 		j++
+	// 		error -= 1.0
+	// 	}
+	// }
+
+	dx := x1 - x
+	if dx < 0 {
+		dx = -dx
+	}
+	dy := y1 - y
+	if dy < 0 {
+		dy = -dy
+	}
+	var sx, sy int
+	if x < x1 {
+		sx = 1
+	} else {
+		sx = -1
+	}
+	if y < y1 {
+		sy = 1
+	} else {
+		sy = -1
+	}
+	err := dx - dy
+
+	for {
+		grid[x][y].backbone = true
+		if x == x1 && y == y1 {
+			break
+		}
+		e2 := 2 * err
+		if e2 > -dy {
+			err -= dy
+			x += sx
+		}
+		if e2 < dx {
+			err += dx
+			y += sy
+		}
+	}
 	return grid
 }
 
