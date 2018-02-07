@@ -1,5 +1,5 @@
 # hashCode2017
-My attempt at hashCode 2017 final
+My attempt at google's hashCode 2017 Final
 
 [The Problem](https://hashcode.withgoogle.com/2017/tasks/hashcode2017_final_task.pdf)
 
