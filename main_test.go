@@ -9,17 +9,17 @@ func TestReadFile(t *testing.T) {
 	result := readFile("final_round_2017.in/test.in")
 	var expected file
 	expected.routerRange = 3
-	expected.backbone = 1
-	expected.router = 100
+	expected.backboneCost = 1
+	expected.routerCost = 100
 	expected.budget = 220
 	if result.routerRange != expected.routerRange {
 		t.Fatalf("Read File Error: \n%v\n%v", result.routerRange, expected.routerRange)
 	}
-	if result.backbone != expected.backbone {
-		t.Fatalf("Read File Error: \n%v\n%v", result.backbone, expected.backbone)
+	if result.backboneCost != expected.backboneCost {
+		t.Fatalf("Read File Error: \n%v\n%v", result.backboneCost, expected.backboneCost)
 	}
-	if result.router != expected.router {
-		t.Fatalf("Read File Error: \n%v\n%v", result.router, expected.router)
+	if result.routerCost != expected.routerCost {
+		t.Fatalf("Read File Error: \n%v\n%v", result.routerCost, expected.routerCost)
 	}
 	if result.budget != expected.budget {
 		t.Fatalf("Read File Error: \n%v\n%v", result.budget, expected.budget)
