@@ -6,11 +6,11 @@ My attempt at hashCode 2017 final
 ## Running it
 **Linux**
 
-```./hashCode2017 <filename>```
+```./hashCode2017 <input-filename> <output-filename>```
 
 **Windows**
 
-```hashCode2017.exe <filename>```
+```hashCode2017.exe <input-filename> <output-filename>```
 
 
 Files can be found in *final_round_2017.in*

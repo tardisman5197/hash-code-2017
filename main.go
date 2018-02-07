@@ -3,6 +3,7 @@ package main
 import (
 	"bufio"
 	"fmt"
+	"log"
 	"math"
 	"os"
 	"strconv"
@@ -37,23 +38,6 @@ const (
 
 func main() {
 	start := time.Now()
-	// Read File
-
-	// file := readFile("final_round_2017.in/test.in")
-	// file.grid[3][6].router = true
-	// file.grid = addCoverage(file.grid, file.routerRange, 3, 6)
-	// file.grid = connectToBackbone(file.grid, 3, 6)
-	// file.grid[3][9].router = true
-	// file.grid = addCoverage(file.grid, file.routerRange, 3, 9)
-	// file.grid = connectToBackbone(file.grid, 3, 9)
-	// printGrid(file.grid)
-	// fmt.Println(calculateScore(file))
-	//
-	// newFile := readFile("final_round_2017.in/test.in")
-	// newFile = run(newFile)
-	// printGrid(newFile.grid)
-	// fmt.Println(covered(newFile.grid))
-	// fmt.Printf("cost: %v budget: %v\n", newFile.cost, newFile.budget)
 
 	newFile := readFile(os.Args[1])
 	newFile = run(newFile)
@@ -69,6 +53,7 @@ func main() {
 	// Output file
 	fmt.Printf("Execute time: %v\n", time.Since(start))
 	fmt.Printf("Score: %v\n", calculateScore(newFile))
+	writeFile(os.Args[2], newFile.grid)
 }
 
 func run(newFile file) file {
@@ -334,4 +319,32 @@ func getRating(grid [][]cell, radius, x, y int) int {
 		}
 	}
 	return rating
+}
+
+func writeFile(filename string, grid [][]cell) {
+	file, err := os.Create(filename)
+	if err != nil {
+		log.Fatal("Cannot create file", err)
+	}
+	defer file.Close()
+
+	var backboneTotal, routerTotal, backbones, routers = 0, 0, "", ""
+
+	for i := 0; i < len(grid); i++ {
+		for j := 0; j < len(grid[0]); j++ {
+			if grid[i][j].backbone {
+				backboneTotal++
+				backbones += strconv.Itoa(i) + " " + strconv.Itoa(j) + "\n"
+			}
+			if grid[i][j].router {
+				routerTotal++
+				routers += strconv.Itoa(i) + " " + strconv.Itoa(j) + "\n"
+			}
+		}
+	}
+	outputStr := strconv.Itoa(backboneTotal) + "\n"
+	outputStr += backbones
+	outputStr += strconv.Itoa(routerTotal) + "\n"
+	outputStr += routers
+	fmt.Fprintf(file, outputStr)
 }
