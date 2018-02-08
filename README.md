@@ -23,6 +23,6 @@ Files can be found in *final_round_2017.in*
 3. Print everything
 
 ## Make it better
-* Backbone mapping can be diagonal
+* Map backbone after router placement
 * Make it faster somehow
 * Make the rating function better to adjust for distance from backbone
