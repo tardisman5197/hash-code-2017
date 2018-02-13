@@ -26,3 +26,18 @@ Files can be found in *final_round_2017.in*
 * Map backbone after router placement
 * Make it faster somehow
 * Make the rating function better to adjust for distance from backbone
+
+## Scores
+2017 HashCode [Scoreboard](https://hashcode.withgoogle.com/hashcode_2017.html)
+
+My Overall Score: 539,378,943
+### Files
+[test.in](https://github.com/tardisman5197/hashCode2017/blob/master/final_round_2017.in/test.in): 65,907
+
+[charleston_road.in](https://github.com/tardisman5197/hashCode2017/blob/master/final_round_2017.in/charleston_road.in): 21,959,496
+
+[rue_de_londres.in](https://github.com/tardisman5197/hashCode2017/blob/master/final_round_2017.in/rue_de_londres.in): 57,509,784
+
+[opera.in](https://github.com/tardisman5197/hashCode2017/blob/master/final_round_2017.in/opera.in): 169,719,814
+
+[lets_go_higher.in](https://github.com/tardisman5197/hashCode2017/blob/master/final_round_2017.in/lets_go_higher.in): 290,123,942
